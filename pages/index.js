@@ -2,7 +2,7 @@ import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function ProfileSidebar(props) {
   return (
@@ -22,7 +22,41 @@ function ProfileSidebar(props) {
   )
 }
 
+function ProfileRelationsBox(props){
+  return (
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">
+        {props.title}({props.item.length})
+      </h2>
+      <ul>
+        {props.item.map((itemAtual) => { 
+          return (
+            <li key={itemAtual.id}>
+              <a href={`/users/${itemAtual.title}`}>
+                <img src={itemAtual.image} />
+                <span>{itemAtual.title}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
+  const [seguidores, setSeguidores] = useState([]);
+  
+  useEffect(() => {
+    fetch('https://api.github.com/users/ThalesTrombim/followers')
+    .then((res) => {
+      return res.json();
+    })
+    .then((completeRes) => {
+      setSeguidores(completeRes);
+    })
+  }, [])
+  
   const [comunidades, setComunidades] = useState(['']);
   const usuarioAleatorio = 'ThalesTrombim';
   const pessoasFavoritas = [
@@ -72,7 +106,7 @@ export default function Home() {
                     name="title"
                     aria-label="Qual vai ser o nome da sua comunidade?"
                   />
-                </div>
+                </div> 
                 <div>
                   <input 
                     type="text" 
@@ -89,21 +123,13 @@ export default function Home() {
             </Box>
           </Box>
         </div>
+
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.id}>
-                    <a href={`/users/${itemAtual.title}`}>
-                      <img src={itemAtual.image} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Seguidores" item={seguidores} />
+
+          <ProfileRelationsBox title="Comunidades" item={comunidades} />
+
+          <ProfileRelationsBox title="Pessoas da Comunidade" item={comunidades} />
 
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
@@ -123,6 +149,7 @@ export default function Home() {
               })}
             </ul>
           </ProfileRelationsBoxWrapper>
+
         </div>
       </MainGrid>
     </>
