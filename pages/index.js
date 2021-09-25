@@ -55,6 +55,19 @@ export default function Home() {
     .then((completeRes) => {
       setSeguidores(completeRes);
     })
+
+    fetch('https://graphql.datocms.com/', {
+      method='POST', 
+
+    })
+
+
+    .then((res) => {
+      return res.json();
+    })
+    .then((completeRes) => {
+      setSeguidores(completeRes);
+    })
   }, [])
   
   const [comunidades, setComunidades] = useState(['']);
@@ -129,7 +142,7 @@ export default function Home() {
 
           <ProfileRelationsBox title="Comunidades" item={comunidades} />
 
-          <ProfileRelationsBox title="Pessoas da Comunidade" item={comunidades} />
+          <ProfileRelationsBox title="Pessoas da Comunidade" item={pessoasFavoritas} />
 
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
