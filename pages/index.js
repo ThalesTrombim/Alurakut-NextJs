@@ -56,18 +56,29 @@ export default function Home() {
       setSeguidores(completeRes);
     })
 
+
+    //GraphQl
     fetch('https://graphql.datocms.com/', {
-      method='POST', 
+      method: 'POST', 
+      headers: {
+        'Authorization': 'be5874a18ccdb8e180cd76f7c2fe3a',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ "query": `query {
+        allCommunities {
+          id
+          title
+          imageUrl
+          creatorSlug
+        }
+      }` })
+      })
+      .then((res) => res.json())
+      .then((CompleteRe) => {
+        console.log(CompleteRe);
+      })
 
-    })
-
-
-    .then((res) => {
-      return res.json();
-    })
-    .then((completeRes) => {
-      setSeguidores(completeRes);
-    })
   }, [])
   
   const [comunidades, setComunidades] = useState(['']);
