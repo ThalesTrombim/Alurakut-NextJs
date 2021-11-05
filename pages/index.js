@@ -31,9 +31,9 @@ function ProfileRelationsBox(props){
       <ul>
         {props.item.map((itemAtual) => { 
           return (
-            <li key={itemAtual.id}>
-              <a href={`/users/${itemAtual.title}`}>
-                <img src={itemAtual.image} />
+            <li key={itemAtual.id} >
+              <a href={`/communities/${itemAtual.id}`}>
+                <img src={itemAtual.imageUrl} />
                 <span>{itemAtual.title}</span>
               </a>
             </li>
@@ -46,13 +46,24 @@ function ProfileRelationsBox(props){
 
 export default function Home() {
   const [seguidores, setSeguidores] = useState([]);
-  
+  const [comunidades, setComunidades] = useState(['']);
+  const usuarioAleatorio = 'ThalesTrombim';
+  const pessoasFavoritas = [
+    'juunegreiros',
+    'omariosouto',
+    'peas',
+    'rafaballerini',
+    'marcobrunodev',
+    'diego3g'
+  ]
+
   useEffect(() => {
     fetch('https://api.github.com/users/ThalesTrombim/followers')
     .then((res) => {
       return res.json();
     })
     .then((completeRes) => {
+      console.log(completeRes);
       setSeguidores(completeRes);
     })
 
@@ -61,7 +72,7 @@ export default function Home() {
     fetch('https://graphql.datocms.com/', {
       method: 'POST', 
       headers: {
-        'Authorization': 'be5874a18ccdb8e180cd76f7c2fe3a',
+        'Authorization': '34ba2f33493c83bdd5619cc34f7694',
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
@@ -76,21 +87,13 @@ export default function Home() {
       })
       .then((res) => res.json())
       .then((CompleteRe) => {
-        console.log(CompleteRe);
+        const comunidadesDato = CompleteRe.data.allCommunities;
+        console.log(comunidadesDato);
+        setComunidades(comunidadesDato);
       })
 
   }, [])
   
-  const [comunidades, setComunidades] = useState(['']);
-  const usuarioAleatorio = 'ThalesTrombim';
-  const pessoasFavoritas = [
-    'juunegreiros',
-    'omariosouto',
-    'peas',
-    'rafaballerini',
-    'marcobrunodev',
-    'diego3g'
-  ]
 
   return (
     <>
@@ -115,13 +118,25 @@ export default function Home() {
                 const dadosDoForm = new FormData(e.target);
 
                 const comunidade = {
-                  id: new Date().toISOString(),
                   title: dadosDoForm.get('title'),
-                  image: dadosDoForm.get('image')
+                  image: dadosDoForm.get('image'),
+                  creatorSlug: usuarioAleatorio
                 }
 
-                const comunidadadesAtualizadas = [...comunidades, comunidade]
-                setComunidades(comunidadadesAtualizadas)
+                fetch('/api/comunidades', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(comunidade)
+                })
+                .then(async (response) => {
+                  const dados = await response.json();
+                  console.log(dados.registroCriado);
+                })
+
+                // const comunidadadesAtualizadas = [...comunidades, comunidade]
+                // setComunidades(comunidadadesAtualizadas)
               }}>
                 <div>
                   <input 
@@ -155,7 +170,7 @@ export default function Home() {
 
           <ProfileRelationsBox title="Pessoas da Comunidade" item={pessoasFavoritas} />
 
-          <ProfileRelationsBoxWrapper>
+          {/* <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
               Pessoas da comunidade ({pessoasFavoritas.length})
             </h2>
@@ -172,7 +187,7 @@ export default function Home() {
                 )
               })}
             </ul>
-          </ProfileRelationsBoxWrapper>
+          </ProfileRelationsBoxWrapper> */}
 
         </div>
       </MainGrid>
